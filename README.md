@@ -7,6 +7,11 @@ INSTALL:
 
 - yarn add @react-navigation/bottom-tabs
 
+INSTALL ANDROID EMULATOR:
+- https://youtu.be/RF7zwYIrlds
+
 RUN:
 - yarn start
+
+
 
