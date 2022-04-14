@@ -6,7 +6,46 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import Header from '../../components/Header'
 import SwitchButton from '../../components/Switch'
 import FanButton from '../../components/Fan'
+import axios from 'axios';
 
+let ledroom, ledhallway, door, light, humi, temp, fanstate;
+var ledroomtime, ledhallwaytime, doortime;
+
+async function lastValueLedroom(){
+    const data = await axios.get('https://io.adafruit.com/api/v2/phongnguyen2001/feeds/ledroom/data');
+    // ledroomtime = data.data[0].created_at - data.data[1].created_at;
+    // console.log(ledroomtime);
+    if(data.data[0].value == 1) ledroom = true;
+    else ledroom = false;
+}
+async function lastValueLedHallway(){
+    const data = await axios.get('https://io.adafruit.com/api/v2/phongnguyen2001/feeds/ledoutdoor/data');
+    if(data.data[0].value == 3) ledhallway = true;
+    else ledhallway = false;
+}
+async function lastValueDoor(){
+    const data = await axios.get('https://io.adafruit.com/api/v2/phongnguyen2001/feeds/door/data');
+    if(data.data[0].value == 5) door = true;
+    else door = false;
+}
+async function lightsensor(){
+    const data = await axios.get('https://io.adafruit.com/api/v2/phongnguyen2001/feeds/light-sensor/data');
+    light = data.data[0].value;
+}
+async function temperaturesensor(){
+    const data = await axios.get('https://io.adafruit.com/api/v2/phongnguyen2001/feeds/temp-sensor/data');
+    temp = data.data[0].value;
+}
+async function lastfanvalue(){
+    const data = await axios.get('https://io.adafruit.com/api/v2/phongnguyen2001/feeds/fan/data');
+    fanstate = data.data[0].value; 
+}
+lastfanvalue();
+lastValueDoor();
+lastValueLedHallway();
+lastValueLedroom();
+lightsensor();
+temperaturesensor();
 export default function Devices({ navigation }) {
     return (
         <View style={styles.container}>
@@ -23,7 +62,7 @@ export default function Devices({ navigation }) {
                     <View style={[styles.sensor, {borderTopLeftRadius: 10, borderBottomLeftRadius: 10}]}> 
                         <SafeAreaView style={{alignItems: 'center', justifyContent: 'center', paddingTop: 10}}>
                             <Text style={styles.sensorData}>
-                                <Ionicons name='thunderstorm' style={styles.sensorData}/> 30 °C
+                                <Ionicons name='thunderstorm' style={styles.sensorData}/> {temp} °C
                             </Text>
                             <Text style={{color: 'white'}}>
                                 Temperature
@@ -34,7 +73,7 @@ export default function Devices({ navigation }) {
                     <View style={[styles.sensor, {}]}> 
                         <SafeAreaView style={{alignItems: 'center', justifyContent: 'center', paddingTop: 10}}>
                             <Text style={styles.sensorData}>
-                                <Ionicons name='sunny' style={styles.sensorData}/> 5 cd
+                                <Ionicons name='sunny' style={styles.sensorData}/> {light} cd
                             </Text>
                             <Text style={{color: 'white'}}>
                                 Light intensity
@@ -60,10 +99,10 @@ export default function Devices({ navigation }) {
                     <Text style={[styles.title, {paddingHorizontal: 24, paddingTop: 24}]}>
                         All Devices
                     </Text>
-                    <SwitchButton switchName={'Door'} time={'3 hours'}  state={true}/>           
-                    <SwitchButton switchName={'Classroom Light'} time={'3 hours'} state={true}/>           
-                    <SwitchButton switchName={'Hallway Light'} time={'5 hours'} state={false}/>           
-                    <FanButton />           
+                    <SwitchButton switchName={'Door'} time={'3 hours'}  state={door}/>           
+                    <SwitchButton switchName={'Classroom Light'} time={'3 hours'} state={ledroom}/>           
+                    <SwitchButton switchName={'Hallway Light'} time={'5 hours'} state={ledhallway}/>           
+                    <FanButton state={fanstate}/>           
                     
                 </View>
                 

@@ -1,12 +1,71 @@
 import React, { useState } from "react";
+import axios from 'axios';
 import { View, Switch, StyleSheet, Text, SafeAreaView, Image } from "react-native";
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import { withRepeat } from "react-native-reanimated";
 
 
 const SwitchButton = ( {switchName, time, state} ) => {
     const [isEnabled, setIsEnabled] = useState(state);
+    
     const toggleSwitch = () => {
         setIsEnabled(previousState => !previousState);
+ 
+        if (switchName == 'Door') {
+            let x = 0;
+            axios.get('https://io.adafruit.com/api/v2/phongnguyen2001/feeds/door/data')
+                .then(data=>{
+                    if(data.data[0].value == 5) x = 6;
+                    else x = 5;
+                    axios({
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-AIO-Key': 'aio_Gsvl46SPpX844VDMJFUb2PbvzeZR'
+                        },
+                        url: 'https://io.adafruit.com/api/v2/phongnguyen2001/feeds/door/data',
+                        data: JSON.stringify({ "value": x })
+                    }).then(data=>{console.log("success")}
+                    )
+                })
+        }
+        else if (switchName == 'Hallway Light') {
+            let x = 0;
+            axios.get('https://io.adafruit.com/api/v2/phongnguyen2001/feeds/ledoutdoor/data')
+            .then(data=>{
+                if(data.data[0].value == 3) x = 4;
+                else x =  3;
+                axios({
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-AIO-Key': 'aio_Gsvl46SPpX844VDMJFUb2PbvzeZR'
+                    },
+                    url: 'https://io.adafruit.com/api/v2/phongnguyen2001/feeds/ledoutdoor/data',
+                    data: JSON.stringify({ "value": x })
+                }).then(data=>{console.log("success")}
+                )
+            })
+            
+        }
+        else{
+            let x = 0;
+            axios.get('https://io.adafruit.com/api/v2/phongnguyen2001/feeds/ledroom/data')
+            .then(data=>{
+                if(data.data[0].value == 1) x = 0;
+                else x = 1;
+                axios({
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-AIO-Key': 'aio_Gsvl46SPpX844VDMJFUb2PbvzeZR'
+                    },
+                    url: 'https://io.adafruit.com/api/v2/phongnguyen2001/feeds/ledroom/data',
+                    data: JSON.stringify({ "value": x })
+                }).then(data=>{console.log("success")}
+                )
+            })
+        }
     }
 
     var switchDescription = "";
