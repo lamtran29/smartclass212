@@ -8,6 +8,7 @@ import SwitchButton from '../../components/Switch'
 import FanButton from '../../components/Fan'
 import axios from 'axios';
 
+<<<<<<< Updated upstream
 let ledroom, ledhallway, door, light, humi, temp, fanstate;
 
 async function lastValueLedroom(){
@@ -44,6 +45,24 @@ lastValueLedHallway();
 lastValueLedroom();
 lightsensor();
 temperaturesensor();
+=======
+const lastValueLedroom = () => {
+    axios.get('https://io.adafruit.com/api/v2/phongnguyen2001/feeds/ledroom/data')
+    .then(data=>{
+        if(data.data[0].value == 1) return true;
+        return false;
+    })
+}
+
+const lastValueDoor = () => {
+    axios.get('https://io.adafruit.com/api/v2/phongnguyen2001/feeds/door/data')
+    .then(data=>{
+        if(data.data[0].value == 5) return true;
+        return false;
+    })
+}
+
+>>>>>>> Stashed changes
 
 export default function Home() {
     return (
@@ -113,8 +132,13 @@ export default function Home() {
                         <Text style={[styles.title, {paddingHorizontal: 24, paddingTop: 24}]}>
                             Devices on
                         </Text>
+<<<<<<< Updated upstream
                         <SwitchButton switchName={'Door'} time={'3 hours'}  state={door} />
                         <SwitchButton switchName={'ClassroomLight'} time={'3 hours'} state={ledroom}/>            
+=======
+                        <SwitchButton switchName={'Door'} time={'3 hours'}  state={lastValueDoor} />
+                        <SwitchButton switchName={'ClassroomLight'} time={'3 hours'} state={lastValueLedroom}/>            
+>>>>>>> Stashed changes
                         {/* <FanButton />            */}
                         
                     </View>
