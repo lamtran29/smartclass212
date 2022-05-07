@@ -1,29 +1,36 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from 'axios';
 import { View, Switch, StyleSheet, Text, SafeAreaView, Image } from "react-native";
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { withRepeat } from "react-native-reanimated";
 
+const url_door = 'https://io.adafruit.com/api/v2/phongnguyen2001/feeds/door/data';
+const url_ledoutdoor = 'https://io.adafruit.com/api/v2/phongnguyen2001/feeds/ledoutdoor/data';
+const url_ledroom = 'https://io.adafruit.com/api/v2/phongnguyen2001/feeds/ledroom/data';
+const KEY = 'dien key vao day';
 
 const SwitchButton = ( {switchName, time, state} ) => {
     const [isEnabled, setIsEnabled] = useState(state);
-    
+    useEffect(() => {
+        setIsEnabled(state);
+    }, [state]);
+
     const toggleSwitch = () => {
         setIsEnabled(previousState => !previousState);
  
         if (switchName == 'Door') {
             let x = 0;
-            axios.get('https://io.adafruit.com/api/v2/phongnguyen2001/feeds/door/data')
+            axios.get(url_door)
                 .then(data=>{
-                    if(data.data[0].value == 5) x = 6;
-                    else x = 5;
+                    if(data.data[0].value == 0) x = 1;
+                    else x = 0;
                     axios({
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
-                            'X-AIO-Key': 'aio_Gsvl46SPpX844VDMJFUb2PbvzeZR'
+                            'X-AIO-Key': KEY
                         },
-                        url: 'https://io.adafruit.com/api/v2/phongnguyen2001/feeds/door/data',
+                        url: url_door,
                         data: JSON.stringify({ "value": x })
                     }).then(data=>{console.log("success")}
                     )
@@ -31,17 +38,17 @@ const SwitchButton = ( {switchName, time, state} ) => {
         }
         else if (switchName == 'Hallway Light') {
             let x = 0;
-            axios.get('https://io.adafruit.com/api/v2/phongnguyen2001/feeds/ledoutdoor/data')
+            axios.get(url_ledoutdoor)
             .then(data=>{
-                if(data.data[0].value == 3) x = 4;
-                else x =  3;
+                if(data.data[0].value == 0) x = 1;
+                else x = 0;
                 axios({
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'X-AIO-Key': 'aio_Gsvl46SPpX844VDMJFUb2PbvzeZR'
+                        'X-AIO-Key': KEY
                     },
-                    url: 'https://io.adafruit.com/api/v2/phongnguyen2001/feeds/ledoutdoor/data',
+                    url: url_ledoutdoor,
                     data: JSON.stringify({ "value": x })
                 }).then(data=>{console.log("success")}
                 )
@@ -50,7 +57,7 @@ const SwitchButton = ( {switchName, time, state} ) => {
         }
         else{
             let x = 0;
-            axios.get('https://io.adafruit.com/api/v2/phongnguyen2001/feeds/ledroom/data')
+            axios.get(url_ledroom)
             .then(data=>{
                 if(data.data[0].value == 1) x = 0;
                 else x = 1;
@@ -58,9 +65,9 @@ const SwitchButton = ( {switchName, time, state} ) => {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'X-AIO-Key': 'aio_Gsvl46SPpX844VDMJFUb2PbvzeZR'
+                        'X-AIO-Key': KEY
                     },
-                    url: 'https://io.adafruit.com/api/v2/phongnguyen2001/feeds/ledroom/data',
+                    url: url_ledroom,
                     data: JSON.stringify({ "value": x })
                 }).then(data=>{console.log("success")}
                 )
@@ -95,7 +102,6 @@ const SwitchButton = ( {switchName, time, state} ) => {
                         padding: 24,
                     }}>
                         <View style={styles.switchHeader}>
-                            {/* icon */}
                             <View style={{
                                 backgroundColor: '#D2E0EE',
                                 width: 45,
@@ -141,16 +147,9 @@ const SwitchButton = ( {switchName, time, state} ) => {
                     </View>
                 </SafeAreaView>
 
-                {/* <Image 
-                    source={require('../assets/img/profile-pic.png')}
-                    style={styles.profileImage}
-                /> */}
-
             </View>
         </SafeAreaView>
 
-
-    
   );
 }
 
@@ -181,69 +180,3 @@ const styles = StyleSheet.create({
 export default SwitchButton;
 
 
-
-// import * as React from 'react';
-// import { View, Text, StyleSheet, SafeAreaView, Image, Switch } from 'react-native';
-// import Ionicons from 'react-native-vector-icons/Ionicons';
-
-// export default function SwitchButton() {
-//     const [isEnabled, setIsEnabled] = useState(false);
-//     const toggleSwitch = () => setIsEnabled(previousState => !previousState);
-
-//     return (
-//         <SafeAreaView>
-//             <View style={[styles.headerWrapper, {paddingTop: 10}]}>
-//                 <SafeAreaView>
-//                     <View style={styles.switchContainer}>
-//                         <View style={styles.switchHeader}>
-//                             {/* icon */}
-//                             <View>
-//                                 <Ionicons name='home' style={styles.sensorData}/>
-//                             </View>
-
-//                             {/* switch name */}
-//                             <Text>Door</Text>
-
-//                             {/* Switch */}
-//                             <View style={styles.container}>
-//                                 <Switch
-//                                     trackColor={{ false: "#767577", true: "#81b0ff" }}
-//                                     thumbColor={isEnabled ? "#f5dd4b" : "#f4f3f4"}
-//                                     ios_backgroundColor="#3e3e3e"
-//                                     onValueChange={toggleSwitch}
-//                                     value={isEnabled}
-//                                 />
-//                             </View>
-//                         </View>
-//                         <Text>Opened 3 hours ago</Text>
-//                     </View>
-//                 </SafeAreaView>
-
-//                 {/* <Image 
-//                     source={require('../assets/img/profile-pic.png')}
-//                     style={styles.profileImage}
-//                 /> */}
-
-//             </View>
-//         </SafeAreaView>
-//     );
-// }
-
-// const styles = StyleSheet.create({
-//     container: {
-//         flex: 1,
-//         alignItems: "center",
-//         justifyContent: "center"
-//     },
-
-//     headerWrapper: {
-//         paddingHorizontal: 24,
-//     },
-
-//     title: {
-//         fontSize: 20, 
-//         fontWeight: 'bold'
-//     },
-
-
-// });

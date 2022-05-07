@@ -1,8 +1,10 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { View, Switch, StyleSheet, Text, SafeAreaView, Image, TouchableOpacity } from "react-native";
 import Ionicons from 'react-native-vector-icons/MaterialCommunityIcons';
 import RadioGroup from 'react-native-radio-buttons-group';
 import axios from 'axios';
+const url_fan = 'https://io.adafruit.com/api/v2/phongnguyen2001/feeds/fan/data';
+const KEY = '';
 
 function RadioButton({selected, optionName}) {
     return (
@@ -38,23 +40,42 @@ function RadioButton({selected, optionName}) {
         </View>
     );
 }
-const FanButton = ( {state} ) => {
-    const [isEnabled, setIsEnabled] = useState(state != 7);
+const FanButton = ( {state, time} ) => {
+    const [isEnabled, setIsEnabled] = useState(state != 0);
+    useEffect(() => {
+        setIsEnabled(state != 0);
+    }, [state]);
+
+    const [low, setLow] = useState(state == 1);
+    useEffect(() => {
+        setLow(state == 1);
+    }, [state]);
+    
+    const [medium, setMedium] = useState(state == 2);
+    useEffect(() => {
+        setMedium(state == 2);
+    }, [state]);
+    
+    const [high, setHigh] = useState(state == 3);
+    useEffect(() => {
+        setHigh(state == 3);
+    }, [state]);
+    
     const toggleSwitch = () => {
         let x;
         setIsEnabled(previousState => !previousState);
-        axios.get('https://io.adafruit.com/api/v2/phongnguyen2001/feeds/fan/data')
+        axios.get(url_fan)
         .then(data=>{
             x = data.data[0].value;
-            if(x == 7) x = 8;
-            else x = 7;
+            if(x == 0) x = 1;
+            else x = 0;
             axios({
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'X-AIO-Key': 'aio_Gsvl46SPpX844VDMJFUb2PbvzeZR'
+                    'X-AIO-Key': KEY
                 },
-                url: 'https://io.adafruit.com/api/v2/phongnguyen2001/feeds/fan/data',
+                url: url_fan,
                 data: JSON.stringify({ "value": x })
             }).then(data=>{console.log("success")}
             )
@@ -67,10 +88,9 @@ const FanButton = ( {state} ) => {
         else setLow(true);
     }
 
-    const [low, setLow] = useState(state == 8);
-    const [medium, setMedium] = useState(state == 9);
-    const [high, setHigh] = useState(state == 10);
-
+    
+    
+    
     const onPressLow = () => {
         if (isEnabled) {
             setLow(true);
@@ -80,10 +100,10 @@ const FanButton = ( {state} ) => {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'X-AIO-Key': 'aio_Gsvl46SPpX844VDMJFUb2PbvzeZR'
+                    'X-AIO-Key': KEY
                 },
-                url: 'https://io.adafruit.com/api/v2/phongnguyen2001/feeds/fan/data',
-                data: JSON.stringify({ "value": 8 })
+                url: url_fan,
+                data: JSON.stringify({ "value": 1 })
             }).then(data=>{console.log("success")}
             )
         }
@@ -98,10 +118,10 @@ const FanButton = ( {state} ) => {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'X-AIO-Key': 'aio_Gsvl46SPpX844VDMJFUb2PbvzeZR'
+                    'X-AIO-Key': KEY
                 },
-                url: 'https://io.adafruit.com/api/v2/phongnguyen2001/feeds/fan/data',
-                data: JSON.stringify({ "value": 9 })
+                url: url_fan,
+                data: JSON.stringify({ "value": 2 })
             }).then(data=>{console.log("success")}
             )
         }
@@ -116,15 +136,25 @@ const FanButton = ( {state} ) => {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'X-AIO-Key': 'aio_Gsvl46SPpX844VDMJFUb2PbvzeZR'
+                    'X-AIO-Key': KEY
                 },
-                url: 'https://io.adafruit.com/api/v2/phongnguyen2001/feeds/fan/data',
-                data: JSON.stringify({ "value": 10 })
+                url: url_fan,
+                data: JSON.stringify({ "value": 3 })
             }).then(data=>{console.log("success")}
             )
         }
     }
    
+    var description = "";
+    if (state == 0)
+        description = 'Turned off ' + time + ' ago';
+    else if (state == 1)
+        description = 'Set to Low ' + time + ' ago';
+    else if (state == 2)
+        description = 'Set to Medium ' + time + ' ago';
+    else if (state == 3)
+        description = 'Set to High ' + time + ' ago';
+
     
     return (
             <SafeAreaView>
@@ -190,6 +220,13 @@ const FanButton = ( {state} ) => {
                             </TouchableOpacity>
                         </View>
                     
+                        <Text style={{
+                            fontSize: 16,
+                            marginTop: 16,
+                            marginLeft: 2,
+                        }}>
+                            {description}
+                        </Text>
                     </View>
                 </SafeAreaView>
 
