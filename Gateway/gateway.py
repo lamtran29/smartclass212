@@ -1,4 +1,5 @@
 import serial.tools.list_ports
+# import random
 import datetime
 import time
 import sys
@@ -255,9 +256,6 @@ auto_thread.start()
 if getPort() != "None":
     ser = serial.Serial(port=getPort(), baudrate=115200)
     isMicrobitConnected = True
-
-# ser = serial.Serial(port="COM2", baudrate=115200)
-# isMicrobitConnected = True
 
 aio = Client(AIO_USERNAME, AIO_KEY)
 fanState = aio.data("da-fan")[0].value
