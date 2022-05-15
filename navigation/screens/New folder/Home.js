@@ -8,14 +8,6 @@ import SwitchButton from '../../components/Switch'
 import FanButton from '../../components/Fan'
 import axios from 'axios';
 
-const url_ledroom = 'https://io.adafruit.com/api/v2/phongnguyen2001/feeds/ledroom/data';
-const url_ledoutdoor = 'https://io.adafruit.com/api/v2/phongnguyen2001/feeds/ledoutdoor/data';
-const url_door = 'https://io.adafruit.com/api/v2/phongnguyen2001/feeds/door/data';
-const url_lightsensor = 'https://io.adafruit.com/api/v2/phongnguyen2001/feeds/light-sensor/data';
-const url_tempsensor = 'https://io.adafruit.com/api/v2/phongnguyen2001/feeds/temp-sensor/data';
-const url_humid = 'https://io.adafruit.com/api/v2/phongnguyen2001/feeds/humid/data';
-const url_fan = 'https://io.adafruit.com/api/v2/phongnguyen2001/feeds/fan/data';
-
 function useInterval(callback, delay) {
     const savedCallback = useRef();
   
@@ -37,19 +29,16 @@ function useInterval(callback, delay) {
 }
 
 
-var ledroom, ledhallway, door, light, humi, temp, fanstate;
-var ledroomtime, ledhallwaytime, doortime, fantime;
+let ledroom, ledhallway, door, light, humi, temp, fanstate;
+var ledroomtime, ledhallwaytime, doortime;
 var ledroomday, ledroomhour, ledroomminute;
 var ledhallwayday, ledhallwayhour, ledhallwayminute;
 var doortimeday, doortimehour, doortimeminute;
-var fanday, fanhour, fanminute;
 var ledresult = "";
 var ledhallwayresult = "";
 var doorresult = "";
-var fanresult = "";
-
 async function lastValueLedroom(){
-    const data = await axios.get(url_ledroom);
+    const data = await axios.get('https://io.adafruit.com/api/v2/phongnguyen2001/feeds/ledroom/data');
     if(data.data[0].value == 1) ledroom = true;
     else ledroom = false;
     let currtime = Math.floor((new Date())/1000);
@@ -73,7 +62,7 @@ async function lastValueLedroom(){
     }  
 }
 async function lastValueLedHallway(){
-    const data = await axios.get(url_ledoutdoor);
+    const data = await axios.get('https://io.adafruit.com/api/v2/phongnguyen2001/feeds/ledoutdoor/data');
     if(data.data[0].value == 1) ledhallway = true;
     else ledhallway = false;
 
@@ -98,7 +87,7 @@ async function lastValueLedHallway(){
     }
 }
 async function lastValueDoor(){
-    const data = await axios.get(url_door);
+    const data = await axios.get('https://io.adafruit.com/api/v2/phongnguyen2001/feeds/door/data');
     if(data.data[0].value == 1) door = true;
     else door = false;
 
@@ -122,44 +111,17 @@ async function lastValueDoor(){
         else doorresult = doortimeminute + " minutes";
     }
 }
-
-async function lastfanvalue(){
-    const data = await axios.get(url_fan);
-    fanstate = data.data[0].value; 
-
-    let currtime = Math.floor((new Date())/1000);
-    fantime = currtime - data.data[0].created_epoch;
-    fanday = Math.floor(fantime/86400);
-    fantime = fantime - fanday*86400;
-    fanhour = Math.floor(fantime/3600);
-    fantime = fantime - fanhour*3600;
-    fanminute = Math.floor(fantime/60);
-    if (fanday != 0){
-        if(fanday == 1) fanresult = fanday + " day";
-        else fanresult = fanday + " days";
-    }
-    else if(fanhour != 0){
-        if(fanhour == 1) fanresult = fanhour + " hour";
-        else fanresult = fanhour + " hours";
-    }
-    else{
-        if(fanminute == 1 || fanminute == 0) fanresult = fanminute + " minute";
-        else fanresult = fanminute + " minutes";
-    }
-}
-
 async function lightsensor(){
-    const data = await axios.get(url_lightsensor);
+    const data = await axios.get('https://io.adafruit.com/api/v2/phongnguyen2001/feeds/light-sensor/data');
     light = data.data[0].value;
 }
 async function temperaturesensor(){
-    const data = await axios.get(url_tempsensor);
+    const data = await axios.get('https://io.adafruit.com/api/v2/phongnguyen2001/feeds/temp-sensor/data');
     temp = data.data[0].value;
 }
-
-async function humidsensor(){
-    const data = await axios.get(url_humid);
-    humi = data.data[0].value;
+async function lastfanvalue(){
+    const data = await axios.get('https://io.adafruit.com/api/v2/phongnguyen2001/feeds/fan/data');
+    fanstate = data.data[0].value; 
 }
 
 function update() {
@@ -169,7 +131,6 @@ function update() {
     lastValueLedroom();
     lightsensor();
     temperaturesensor();
-    humidsensor();
 }
 
 update();
@@ -190,13 +151,7 @@ export default function Home() {
     const [fan, setFan] = useState(fanstate);
     const [tempData, setTempData] = useState(temp);
     const [lightData, setLightData] = useState(light);
-    const [humidData, setHumidData] = useState(humi);
     const [count, setCount] = useState(countDevices());
-
-    const [doorTime, setDoorTime] = useState(doorresult);
-    const [rLightTime, setRLightTime] = useState(ledresult);
-    const [hLightTime, setHLightTime] = useState(ledhallwayresult);
-    const [fanTime, setFanTime] = useState(fanresult);
 
     useInterval(() => {
         update();
@@ -207,11 +162,6 @@ export default function Home() {
         setFan(fanstate);
         setTempData(temp);
         setLightData(light);
-        setHumidData(humi);
-        setDoorTime(doorresult);
-        setRLightTime(ledresult);
-        setHLightTime(ledhallwayresult);
-        setFanTime(fanresult);
     }, 1000);
 
     return (
@@ -256,7 +206,7 @@ export default function Home() {
                             <View style={[styles.sensor, {borderBottomLeftRadius: 20}]}> 
                                 <SafeAreaView style={{alignItems: 'center', justifyContent: 'center', paddingTop: 10}}>
                                     <Text style={styles.sensorData}>
-                                        <Ionicons name='water' style={styles.sensorData}/> {humidData} % 
+                                        <Ionicons name='water' style={styles.sensorData}/> 60 % 
                                     </Text>
                                     <Text style={{color: 'white'}}>
                                         Humidity
@@ -283,10 +233,10 @@ export default function Home() {
                         <Text style={[styles.title, {paddingHorizontal: 24, paddingTop: 24}]}>
                             Devices on
                         </Text>
-                        {classDoor && <SwitchButton switchName={'Door'} time={doorTime}  state={classDoor}/>}           
-                        {classLight && <SwitchButton switchName={'Classroom Light'} time={rLightTime} state={classLight}/>}           
-                        {hallwayLight && <SwitchButton switchName={'Hallway Light'} time={hLightTime} state={hallwayLight}/>}            
-                        {fan != 0 && <FanButton state={fan} time={fanTime}/>}           
+                        {classDoor && <SwitchButton switchName={'Door'} time={doorresult}  state={classDoor}/>}           
+                        {classLight && <SwitchButton switchName={'Classroom Light'} time={ledresult} state={classLight}/>}           
+                        {hallwayLight && <SwitchButton switchName={'Hallway Light'} time={ledhallwayresult} state={hallwayLight}/>}            
+                        {fan != 0 && <FanButton state={fan}/>}           
                     </View>
                 </View>
             </ScrollView>

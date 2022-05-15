@@ -3,7 +3,7 @@ import { View, Switch, StyleSheet, Text, SafeAreaView, Image } from "react-nativ
 import Ionicons from 'react-native-vector-icons//MaterialCommunityIcons';
 
 
-const SwitchButton = ( {name, time, state} ) => {
+const SwitchButton = ( {name, hour, minute, state} ) => {
   
     var message = "";
     var icon = 'home';
@@ -29,11 +29,9 @@ const SwitchButton = ( {name, time, state} ) => {
     }
 
     else if (name == 'fan') {
-
-        if (state == 0) message = 'The fan is turned off';
-        else if (state == 1) message = 'The fan speed is set to Low'
-        else if (state == 2) message = 'The fan speed is set to Medium'
-        else if (state == 3) message = 'The fan speed is set to High'
+        if (state)
+            message = 'The classroom fan is turned on';
+        else message = 'The classroom fan is turned off';
         icon = 'fan';
     }
     
@@ -63,7 +61,7 @@ const SwitchButton = ( {name, time, state} ) => {
                                 }}/>
                             </View>
                             <View style={{marginLeft: 12}}>
-                                <Text style={{color: 'grey'}}>{time}</Text>
+                                <Text style={{color: 'grey'}}>{hour}:{minute}</Text>
                                 <Text style={{fontSize: 16, fontWeight: 'bold'}}>
                                     {message}
                                 </Text>
